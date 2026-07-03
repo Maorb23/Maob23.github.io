@@ -55,7 +55,8 @@ select {
 .controls-band,
 .workspace,
 .memory-band,
-.compute-band {
+.compute-band,
+.site-credit {
   border-bottom: 1px solid var(--line);
 }
 
@@ -65,6 +66,21 @@ select {
   gap: 2rem;
   padding: 28px 32px 24px;
   background: rgba(50, 0, 16, 0.68);
+}
+
+.topbar > div {
+  min-width: 0;
+}
+
+.kernel-switcher {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.kernel-switcher button {
+  min-width: 132px;
 }
 
 .eyebrow,
@@ -118,7 +134,7 @@ h1 {
 
 .controls-band {
   display: grid;
-  grid-template-columns: 1fr 1fr auto auto auto;
+  grid-template-columns: 1fr 1fr 0.85fr auto auto auto;
   gap: 22px;
   align-items: end;
   padding: 22px 24px;
@@ -140,6 +156,10 @@ h1 {
 
 .control-field.compact {
   min-width: 145px;
+}
+
+.hidden {
+  display: none;
 }
 
 select {
@@ -304,6 +324,7 @@ pre {
 
 .lane-strip {
   padding: 12px 20px 20px;
+  overflow-x: auto;
 }
 
 .lane-head {
@@ -432,6 +453,14 @@ pre {
   font-weight: 650;
 }
 
+.multiply-cell .hot {
+  color: var(--red);
+}
+
+.multiply-cell .cool {
+  color: var(--green);
+}
+
 #sumLine {
   margin: 18px 0 0;
   color: var(--green);
@@ -467,6 +496,32 @@ code {
   padding: 0.05rem 0.22rem;
 }
 
+.site-credit {
+  padding: 16px 24px;
+  color: var(--muted);
+  background: rgba(35, 0, 12, 0.78);
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.site-credit a {
+  color: var(--gold);
+  font-weight: 650;
+  text-decoration-color: rgba(255, 209, 108, 0.45);
+  text-underline-offset: 3px;
+}
+
+.site-credit a:hover {
+  color: #fff2c7;
+  text-decoration-color: currentColor;
+}
+
+@media (max-width: 1320px) {
+  .controls-band {
+    grid-template-columns: repeat(3, minmax(180px, 1fr));
+  }
+}
+
 @media (max-width: 1100px) {
   .topbar,
   .workspace,
@@ -495,7 +550,8 @@ code {
   .controls-band,
   .panel-title,
   .compute-expression,
-  .concepts {
+  .concepts,
+  .site-credit {
     padding-left: 14px;
     padding-right: 14px;
   }

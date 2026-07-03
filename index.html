@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Triton Matvec Visualizer</title>
+    <title>Triton Kernel Visualizer</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -11,7 +11,11 @@
       <section class="topbar">
         <div>
           <p class="eyebrow">Triton architecture lab</p>
-          <h1>Matvec kernel visualizer</h1>
+          <h1 id="kernelTitle">Matvec kernel visualizer</h1>
+          <div class="kernel-switcher" aria-label="Kernel visualization">
+            <button id="matvecKernelBtn" type="button" data-kernel="matvec" class="active">Matvec</button>
+            <button id="softmaxKernelBtn" type="button" data-kernel="softmax">Fused softmax</button>
+          </div>
         </div>
         <div class="status-grid" aria-live="polite">
           <div>
@@ -31,14 +35,19 @@
 
       <section class="controls-band" aria-label="Kernel controls">
         <label class="control-field">
-          <span>M rows</span>
+          <span id="mLabel">M rows</span>
           <input id="mInput" type="range" min="2" max="8" value="6" />
           <strong id="mValue">6</strong>
         </label>
         <label class="control-field">
-          <span>N columns</span>
+          <span id="nLabel">N columns</span>
           <input id="nInput" type="range" min="3" max="14" value="10" />
           <strong id="nValue">10</strong>
+        </label>
+        <label id="temperatureControl" class="control-field hidden">
+          <span>Temperature</span>
+          <input id="temperatureInput" type="range" min="4" max="24" value="10" />
+          <strong id="temperatureValue">1.0</strong>
         </label>
         <fieldset class="segmented" aria-label="Block size">
           <legend>BLOCK_SIZE</legend>
@@ -61,7 +70,7 @@
       <section class="workspace">
         <section class="code-panel" aria-label="Triton code walkthrough">
           <div class="panel-title">
-            <span>matvec_kernel.py</span>
+            <span id="codeFileLabel">matvec_kernel.py</span>
             <strong id="codeProgramLabel">program 0 / 5</strong>
           </div>
           <pre id="codeBlock"></pre>
@@ -70,7 +79,7 @@
 
         <section class="diagram-panel" aria-label="Execution diagram">
           <div class="panel-title">
-            <span>One program per row</span>
+            <span id="programPanelTitle">One program per row</span>
             <strong id="rowFormula">row = tl.program_id(0)</strong>
           </div>
           <div id="rowPrograms" class="row-programs"></div>
@@ -87,22 +96,22 @@
       <section class="memory-band">
         <div class="memory-section matrix-section">
           <div class="panel-title">
-            <span>A memory, flattened row-major</span>
+            <span id="matrixTitle">A memory, flattened row-major</span>
             <strong id="aOffsetLabel">a_ptr + row * N + cols</strong>
           </div>
           <div id="matrixGrid" class="matrix-grid"></div>
         </div>
         <div class="memory-section">
           <div class="panel-title">
-            <span>x vector</span>
-            <strong>x_ptr + cols</strong>
+            <span id="xTitle">x vector</span>
+            <strong id="xOffsetLabel">x_ptr + cols</strong>
           </div>
           <div id="xGrid" class="vector-grid"></div>
         </div>
         <div class="memory-section">
           <div class="panel-title">
-            <span>output vector</span>
-            <strong>output_ptr + row</strong>
+            <span id="outTitle">output vector</span>
+            <strong id="outOffsetLabel">output_ptr + row</strong>
           </div>
           <div id="outGrid" class="vector-grid output-grid"></div>
         </div>
@@ -117,17 +126,23 @@
         <aside class="concepts">
           <h2>Pointer map</h2>
           <dl>
-            <dt>Program id</dt>
-            <dd><code>tl.program_id(0)</code> chooses the output row.</dd>
-            <dt>Column lanes</dt>
-            <dd><code>tl.arange(0, BLOCK_SIZE)</code> creates SIMD-like lane offsets.</dd>
-            <dt>A offsets</dt>
-            <dd><code>row * N + cols</code> walks across one matrix row in row-major memory.</dd>
-            <dt>Mask</dt>
-            <dd><code>cols &lt; N</code> disables lanes past the real row width.</dd>
+            <dt id="conceptOneTitle">Program id</dt>
+            <dd id="conceptOneBody"><code>tl.program_id(0)</code> chooses the output row.</dd>
+            <dt id="conceptTwoTitle">Column lanes</dt>
+            <dd id="conceptTwoBody"><code>tl.arange(0, BLOCK_SIZE)</code> creates SIMD-like lane offsets.</dd>
+            <dt id="conceptThreeTitle">A offsets</dt>
+            <dd id="conceptThreeBody"><code>row * N + cols</code> walks across one matrix row in row-major memory.</dd>
+            <dt id="conceptFourTitle">Mask</dt>
+            <dd id="conceptFourBody"><code>cols &lt; N</code> disables lanes past the real row width.</dd>
           </dl>
         </aside>
       </section>
+
+      <footer class="site-credit">
+        Credit to
+        <a href="https://kernelacademy.dev/" target="_blank" rel="noopener noreferrer">Kernel Academy</a>
+        -- learn Triton effectively with fast results.
+      </footer>
     </main>
     <script src="app.js"></script>
   </body>
