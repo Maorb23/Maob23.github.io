@@ -1,4 +1,4 @@
-# Maob23.gitub.io# CUDA Edu - Triton Matvec Visualizer
+# Maob23.gitub.io CUDA Edu - Triton Matvec Visualizer
 
 An interactive visualizer for understanding a Triton matrix-vector multiplication kernel.
 
