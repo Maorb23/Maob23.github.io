@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Triton Matvec Visualizer</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="topbar">
+        <div>
+          <p class="eyebrow">Triton architecture lab</p>
+          <h1>Matvec kernel visualizer</h1>
+        </div>
+        <div class="status-grid" aria-live="polite">
+          <div>
+            <span>Grid</span>
+            <strong id="gridLabel">(6,) programs</strong>
+          </div>
+          <div>
+            <span>Program</span>
+            <strong id="programLabel">row 0</strong>
+          </div>
+          <div>
+            <span>Step</span>
+            <strong id="stepLabel">1 / 9</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="controls-band" aria-label="Kernel controls">
+        <label class="control-field">
+          <span>M rows</span>
+          <input id="mInput" type="range" min="2" max="8" value="6" />
+          <strong id="mValue">6</strong>
+        </label>
+        <label class="control-field">
+          <span>N columns</span>
+          <input id="nInput" type="range" min="3" max="14" value="10" />
+          <strong id="nValue">10</strong>
+        </label>
+        <fieldset class="segmented" aria-label="Block size">
+          <legend>BLOCK_SIZE</legend>
+          <button type="button" data-block="4">4</button>
+          <button type="button" data-block="8">8</button>
+          <button type="button" data-block="16" class="active">16</button>
+        </fieldset>
+        <label class="control-field compact">
+          <span>Row program</span>
+          <select id="rowSelect"></select>
+        </label>
+        <div class="button-row">
+          <button id="resetBtn" class="ghost" type="button" title="Reset">Reset</button>
+          <button id="prevBtn" class="ghost" type="button" title="Previous step">Back</button>
+          <button id="nextBtn" type="button" title="Next step">Step</button>
+          <button id="runBtn" type="button" title="Run or pause">Run</button>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <section class="code-panel" aria-label="Triton code walkthrough">
+          <div class="panel-title">
+            <span>matvec_kernel.py</span>
+            <strong id="codeProgramLabel">program 0 / 5</strong>
+          </div>
+          <pre id="codeBlock"></pre>
+          <p id="stepNote" class="step-note"></p>
+        </section>
+
+        <section class="diagram-panel" aria-label="Execution diagram">
+          <div class="panel-title">
+            <span>One program per row</span>
+            <strong id="rowFormula">row = tl.program_id(0)</strong>
+          </div>
+          <div id="rowPrograms" class="row-programs"></div>
+          <div class="lane-strip">
+            <div class="lane-head">
+              <span>Block lanes</span>
+              <strong id="laneCaption">16 lanes touch columns 0..15</strong>
+            </div>
+            <div id="laneGrid" class="lane-grid"></div>
+          </div>
+        </section>
+      </section>
+
+      <section class="memory-band">
+        <div class="memory-section matrix-section">
+          <div class="panel-title">
+            <span>A memory, flattened row-major</span>
+            <strong id="aOffsetLabel">a_ptr + row * N + cols</strong>
+          </div>
+          <div id="matrixGrid" class="matrix-grid"></div>
+        </div>
+        <div class="memory-section">
+          <div class="panel-title">
+            <span>x vector</span>
+            <strong>x_ptr + cols</strong>
+          </div>
+          <div id="xGrid" class="vector-grid"></div>
+        </div>
+        <div class="memory-section">
+          <div class="panel-title">
+            <span>output vector</span>
+            <strong>output_ptr + row</strong>
+          </div>
+          <div id="outGrid" class="vector-grid output-grid"></div>
+        </div>
+      </section>
+
+      <section class="compute-band">
+        <div class="compute-expression">
+          <span id="computeTitle">Computation for row 0</span>
+          <div id="multiplyGrid" class="multiply-grid"></div>
+          <p id="sumLine"></p>
+        </div>
+        <aside class="concepts">
+          <h2>Pointer map</h2>
+          <dl>
+            <dt>Program id</dt>
+            <dd><code>tl.program_id(0)</code> chooses the output row.</dd>
+            <dt>Column lanes</dt>
+            <dd><code>tl.arange(0, BLOCK_SIZE)</code> creates SIMD-like lane offsets.</dd>
+            <dt>A offsets</dt>
+            <dd><code>row * N + cols</code> walks across one matrix row in row-major memory.</dd>
+            <dt>Mask</dt>
+            <dd><code>cols &lt; N</code> disables lanes past the real row width.</dd>
+          </dl>
+        </aside>
+      </section>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>
